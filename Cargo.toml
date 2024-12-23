@@ -7,7 +7,7 @@ repository = "https://github.com/PRO-2684/scheval"
 license = "MIT"
 readme = "README.md"
 description = "A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate."
-keywords = ["json", "schema", "validation", "cli", "command-line", "tool"]
+keywords = ["json", "schema", "validation", "cli", "command-line"]
 
 [dependencies]
 clap = { version = "4.5.23", features = ["derive"] }
