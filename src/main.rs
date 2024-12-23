@@ -1,7 +1,6 @@
-use clap::Parser;
-use scheval::{Args, run};
+use scheval::{get_config, run};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = Args::parse();
+    let args = get_config();
     run(&args)
 }
