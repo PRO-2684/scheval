@@ -19,3 +19,9 @@ Options:
 ```
 
 Note that `vscode` are not supported yet.
+
+## TODO
+
+- [ ] Implement `vscode` auto detection
+- [ ] Adding more tests
+- [ ] Possibly adding more features
