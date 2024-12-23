@@ -1,9 +1,9 @@
 //! suffix auto detection: Validate `<filename>.json` with `<filename>.schema.json` under working directory.
 
 use super::Feature;
-
 use std::{fs, path::Path};
 
+/// A feature of scheval, capable of finding `<filename>.json` with `<filename>.schema.json` under working directory.
 pub struct Suffix;
 
 impl Feature for Suffix {

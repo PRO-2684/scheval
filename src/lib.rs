@@ -4,6 +4,7 @@ use std::{fs::File, io::BufReader, path::Path};
 mod features;
 use features::Feature;
 
+/// Command line arguments.
 #[derive(Parser, Debug)]
 #[command(version, about = "A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate.", long_about = None)]
 struct Args {
@@ -18,6 +19,7 @@ struct Args {
     all: bool,
 }
 
+/// Configuration options. (Simple wrapper around `Args`)
 #[derive(Debug)]
 pub struct Config {
     pub vscode: bool,
@@ -32,11 +34,13 @@ impl From<Args> for Config {
     }
 }
 
+/// Parse command line arguments and return configuration options.
 pub fn get_config() -> Config {
     let args = Args::parse();
     args.into()
 }
 
+/// Read JSON file from given path.
 fn read_json(
     path: &Path,
 ) -> Result<serde_json::Result<serde_json::Value>, Box<dyn std::error::Error>> {
@@ -45,6 +49,7 @@ fn read_json(
     Ok(serde_json::from_reader(reader))
 }
 
+/// Validate a JSON instance against a JSON Schema.
 pub fn validate_instance(
     instance: &Path,
     schema_path: &Path,
@@ -76,6 +81,7 @@ pub fn validate_instance(
     Ok(success)
 }
 
+/// Run scheval with given configuration.
 pub fn run(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
     if config.vscode {
         // Dummy

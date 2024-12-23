@@ -1,8 +1,9 @@
 mod vscode;
 mod suffix;
 
+/// A feature of scheval that is capable of finding JSON instances and their corresponding schemas.
 pub trait Feature {
-    // Returns a iterator of (schema_path, instance_path) pairs.
+    /// Generate a list of JSON instances and their corresponding schemas.
     fn get_instances(&self) -> impl Iterator<Item = (String, String)>;
 }
 
