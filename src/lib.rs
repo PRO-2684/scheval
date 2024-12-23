@@ -1,14 +1,7 @@
-#![allow(clippy::print_stdout)]
-use std::{
-    fs::File,
-    io::BufReader,
-    path::{Path, PathBuf},
-};
-
 use clap::Parser;
+use std::{fs::File, io::BufReader, path::Path};
 
 mod features;
-
 use features::Feature;
 
 #[derive(Parser, Debug)]
@@ -53,7 +46,7 @@ fn read_json(
 }
 
 pub fn validate_instance(
-    instance: &PathBuf,
+    instance: &Path,
     schema_path: &Path,
 ) -> Result<bool, Box<dyn std::error::Error>> {
     let mut success = true;
@@ -91,7 +84,7 @@ pub fn run(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
         let feature = features::Suffix;
         let instances = feature.get_instances().collect::<Vec<_>>();
         for (schema_path, instance_path) in instances {
-            validate_instance(&PathBuf::from(&instance_path), &PathBuf::from(&schema_path))?;
+            validate_instance(&Path::new(&instance_path), &Path::new(&schema_path))?;
         }
     }
     Ok(())

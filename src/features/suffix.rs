@@ -2,13 +2,13 @@
 
 use super::Feature;
 
-use std::{fs, path::PathBuf};
+use std::{fs, path::Path};
 
 pub struct Suffix;
 
 impl Feature for Suffix {
     fn get_instances(&self) -> impl Iterator<Item = (String, String)> {
-        let working_dir = PathBuf::from(".");
+        let working_dir = Path::new(".");
         let entries = fs::read_dir(&working_dir).expect("Failed to list working directory");
         entries.filter_map(|entry| {
             let entry = entry.unwrap();
