@@ -82,7 +82,8 @@ pub fn validate_instance(
 }
 
 /// Run scheval with given configuration.
-pub fn run(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
+pub fn run(config: &Config) -> Result<bool, Box<dyn std::error::Error>> {
+    let mut success = true;
     if config.vscode {
         // Dummy
     }
@@ -90,8 +91,8 @@ pub fn run(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
         let feature = features::Suffix;
         let instances = feature.get_instances().collect::<Vec<_>>();
         for (schema_path, instance_path) in instances {
-            validate_instance(&Path::new(&instance_path), &Path::new(&schema_path))?;
+            success &= validate_instance(&Path::new(&instance_path), &Path::new(&schema_path))?;
         }
     }
-    Ok(())
+    Ok(success)
 }
