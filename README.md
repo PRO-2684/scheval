@@ -20,6 +20,15 @@ Options:
 
 Note that `vscode` are not supported yet.
 
+## Notes
+
+This project uses [`globwalk`](https://github.com/Gilnaa/globwalk) for pattern matching, which might be buggy. Notably in `fileMatch` field:
+
+- `./` is not supported (I've included a quick fix by removing the prefix, but not considering other cases, like `././` or `!./`)
+- `../` is not supported (A warning will be shown, and the pattern will be ignored)
+
+If you have a good alternative which supports [VSCode's `fileMatch` syntax](https://code.visualstudio.com/docs/languages/json#_file-match-syntax), please let me know.
+
 ## TODO
 
 - [ ] Implement `vscode` auto detection
@@ -29,7 +38,7 @@ Note that `vscode` are not supported yet.
   - [ ] Better support for `url`
     - [x] Local schema (path)
     - [ ] Remote schema (URL)
-    - [ ] Inline schema
+  - [x] Support for `schema` (Inline schema)
 - [ ] Smartly exclude paths
   - [ ] Respect `.gitignore`
   - [ ] Ignore paths starting with `.` (hidden files)

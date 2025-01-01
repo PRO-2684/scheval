@@ -5,7 +5,7 @@ use super::{Feature, Schema};
 use crate::regularize;
 use globwalk::GlobWalkerBuilder;
 use jsonc_parser::parse_to_serde_value;
-use serde_json::Value;
+use serde_json::{Value, Map};
 use std::{
     collections::{HashMap, HashSet},
     fs,
@@ -39,6 +39,47 @@ fn read_schema_associations_from_settings() -> Option<Vec<Value>> {
     Some(association_definitions.to_vec())
 }
 
+/// Get schema from an association definition, **consuming** the definition
+fn get_schema(mut association_definition: Map<String, Value>, working_dir: &Path) -> Option<Schema>  {
+    // Unwrap the `url` or `schema` field (schema path or inline schema)
+    let Some(schema_path) = association_definition.get("url") else {
+        // If `url` field is not found, try `schema` field
+        let Some(schema) = association_definition.remove("schema") else {
+            eprintln!("Neither `url` nor `schema` field found in schema");
+            return None;
+        };
+        let Value::Object(_) = schema else { // Check if `schema` is an object
+            eprintln!("`schema` field is not an object");
+            return None;
+        };
+        return Some(Schema::Inline(schema));
+    };
+    let Value::String(schema_path) = schema_path else {
+        eprintln!("`url` field is not a string");
+        return None;
+    };
+    if schema_path.starts_with("http://") || schema_path.starts_with("https://") {
+        eprintln!("Remote schema is not supported");
+        return None;
+    }
+    let mut schema_path = schema_path.to_string();
+    // Resolve schema paths
+    if schema_path.starts_with('/') {
+        // Relative to workspace root
+        schema_path.remove(0); // Remove leading `/`
+    }
+    let schema_path = Path::new(&schema_path);
+    let Ok(schema_path) = schema_path.canonicalize() else {
+        eprintln!(
+            "Failed to canonicalize schema path `{}`",
+            schema_path.to_string_lossy()
+        );
+        return None;
+    };
+    let schema_path = regularize(&working_dir, &schema_path);
+    Some(Schema::Local(schema_path))
+}
+
 impl Feature for Vscode {
     fn get_associations(&self) -> HashMap<Schema, HashSet<PathBuf>> {
         let Ok(working_dir) = Path::new(".").canonicalize() else {
@@ -52,42 +93,13 @@ impl Feature for Vscode {
         let mut associations = HashMap::new();
         for association_definition in association_definitions {
             // Unwrap the association object
-            let Value::Object(schema) = association_definition else {
-                eprintln!("Schema is not an object");
+            let Value::Object(association_definition) = association_definition else {
+                eprintln!("A non-object element found under `json.schemas`");
                 continue;
             };
-
-            // Unwrap the `url` field (schema path)
-            let Some(schema_path) = schema.get("url") else {
-                eprintln!("`url` field not found in schema");
-                continue;
-            };
-            let Value::String(schema_path) = schema_path else {
-                eprintln!("`url` field is not a string");
-                continue;
-            };
-            if schema_path.starts_with("http://") || schema_path.starts_with("https://") {
-                eprintln!("Remote schema is not supported");
-                continue;
-            }
-            let mut schema_path = schema_path.to_string();
-            // Resolve schema paths
-            if schema_path.starts_with('/') {
-                // Relative to workspace root
-                schema_path.remove(0); // Remove leading `/`
-            }
-            let schema_path = Path::new(&schema_path);
-            let Ok(schema_path) = schema_path.canonicalize() else {
-                eprintln!(
-                    "Failed to canonicalize schema path `{}`",
-                    schema_path.to_string_lossy()
-                );
-                continue;
-            };
-            let schema_path = regularize(&working_dir, &schema_path);
 
             // Unwrap the `fileMatch` field (array of glob patterns)
-            let Some(file_match) = schema.get("fileMatch") else {
+            let Some(file_match) = association_definition.get("fileMatch") else {
                 eprintln!("`fileMatch` field not found in schema");
                 continue;
             };
@@ -102,9 +114,23 @@ impl Feature for Vscode {
                         eprintln!("`fileMatch` field contains non-string element");
                         return None;
                     };
-                    Some(pattern.to_string())
+                    let mut pattern = pattern.to_string();
+                    // Quick fix and warning for https://github.com/Gilnaa/globwalk/issues/28
+                    if pattern.starts_with("./") {
+                        pattern = pattern[2..].to_string();
+                    } else if pattern.starts_with("../") {
+                        eprintln!("`fileMatch` patterns starting with `../` are not supported");
+                        return None;
+                    }
+                    Some(pattern)
                 })
                 .collect::<Vec<_>>();
+
+            // Unwrap the `url` or `schema` field (schema path or inline schema)
+            let Some(schema) = get_schema(association_definition, &working_dir) else {
+                eprintln!("Failed to get schema from association definition");
+                continue;
+            };
 
             // Create a GlobWalker for given patterns
             let builder = GlobWalkerBuilder::from_patterns(".", &patterns);
@@ -130,7 +156,6 @@ impl Feature for Vscode {
                 .collect::<HashSet<_>>();
 
             // Update associations
-            let schema = Schema::Local(schema_path);
             associations
                 .entry(schema)
                 .or_insert_with(HashSet::new)
