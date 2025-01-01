@@ -16,15 +16,15 @@ use std::{
 #[derive(Parser, Debug)]
 #[command(version, about = "A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate.", long_about = None)]
 struct Args {
-    /// Enable VSCode auto detection: Respect `json.schemas` field at `.vscode/settings.json` if present.
+    /// What smart including features to use. Available: `vscode`, `suffix`. Default to all
+    ///
+    /// - `vscode`: Respect `json.schemas` field at `.vscode/settings.json` if present
+    /// - `suffix`: Validate `<filename>.json` with `<filename>.schema.json` under working directory
+    #[arg(short, long, verbatim_doc_comment)]
+    include: Vec<String>,
+    /// What smart excluding features to use. Available: TBD
     #[arg(short, long)]
-    vscode: bool,
-    /// Enable suffix auto detection: Validate `<filename>.json` with `<filename>.schema.json` under working directory.
-    #[arg(short, long)]
-    suffix: bool,
-    /// Enable all auto detection features.
-    #[arg(short, long, conflicts_with_all = ["vscode", "suffix"])]
-    all: bool,
+    exclude: Vec<String>,
 }
 
 /// Configuration options. (Simple wrapper around `Args`)
@@ -36,8 +36,9 @@ pub struct Config {
 
 impl From<Args> for Config {
     fn from(args: Args) -> Self {
-        let vscode = args.vscode || args.all;
-        let suffix = args.suffix || args.all;
+        let all = args.include.is_empty();
+        let vscode = args.include.contains(&"vscode".to_string()) || all;
+        let suffix = args.include.contains(&"suffix".to_string()) || all;
         Self { vscode, suffix }
     }
 }

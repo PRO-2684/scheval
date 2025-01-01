@@ -11,11 +11,20 @@ A fast and *smart* command-line tool for JSON Schema validation, powered by the 
 Usage: scheval [OPTIONS]
 
 Options:
-  -v, --vscode   Enable VSCode auto detection: Respect `json.schemas` field at `.vscode/settings.json` if present
-  -s, --suffix   Enable suffix auto detection: Validate `<filename>.json` with `<filename>.schema.json` under working directory
-  -a, --all      Enable all auto detection features
-  -h, --help     Print help
-  -V, --version  Print version
+  -i, --include <INCLUDE>
+          What smart including features to use. Available: `vscode`, `suffix`. Default to all
+
+          - `vscode`: Respect `json.schemas` field at `.vscode/settings.json` if present
+          - `suffix`: Validate `<filename>.json` with `<filename>.schema.json` under working directory
+
+  -e, --exclude <EXCLUDE>
+          What smart excluding features to use. Available: TBD
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
 ```
 
 Note that `vscode` are not supported yet.
