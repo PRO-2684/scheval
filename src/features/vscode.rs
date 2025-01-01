@@ -2,14 +2,15 @@
 // https://code.visualstudio.com/docs/languages/json#_json-schemas-and-settings
 
 use super::Feature;
-use glob::glob;
+// use glob::glob;
+use globwalk::GlobWalkerBuilder;
 use jsonc_parser::parse_to_serde_value;
 use serde_json::Value;
 use std::{fs, path::Path};
 
 pub struct Vscode;
 
-fn read_schemas_from_settings() -> Option<Vec<Value>> {
+fn read_schema_associations_from_settings() -> Option<Vec<Value>> {
     let settings_json = Path::new(".vscode/settings.json");
     if !settings_json.exists() {
         eprintln!("No .vscode/settings.json found");
@@ -36,22 +37,17 @@ fn read_schemas_from_settings() -> Option<Vec<Value>> {
 
 impl Feature for Vscode {
     fn get_instances(&self) -> impl Iterator<Item = (String, String)> {
-        let schemas = read_schemas_from_settings().expect("Failed to get json.schemas as array");
-        schemas
+        let associations = read_schema_associations_from_settings().expect("Failed to get json.schemas as array");
+        associations
             .into_iter()
-            .filter_map(|schema| {
-                let Value::Object(schema) = schema else {
+            .filter_map(|association| {
+                // Unwrap the association object
+                let Value::Object(schema) = association else {
                     eprintln!("Schema is not an object");
                     return None;
                 };
-                let Some(file_match) = schema.get("fileMatch") else {
-                    eprintln!("`fileMatch` field not found in schema");
-                    return None;
-                };
-                let Value::String(file_match) = file_match else {
-                    eprintln!("`fileMatch` field is not a string");
-                    return None;
-                };
+
+                // Unwrap the `url` field (schema path)
                 let Some(schema_path) = schema.get("url") else {
                     eprintln!("`url` field not found in schema");
                     return None;
@@ -60,12 +56,48 @@ impl Feature for Vscode {
                     eprintln!("`url` field is not a string");
                     return None;
                 };
-                let schema_path = schema_path.to_string();
-                let instances = glob(file_match)
-                    .expect("Failed to glob fileMatch")
+                if schema_path.starts_with("http://") || schema_path.starts_with("https://") {
+                    eprintln!("Remote schema is not supported");
+                    return None;
+                }
+                let mut schema_path = schema_path.to_string();
+                // Resolve schema paths
+                if schema_path.starts_with('/') { // Relative to workspace root
+                    schema_path.remove(0); // Remove leading `/`
+                } else { // Relative to `.vscode` directory
+                    schema_path.insert_str(0, ".vscode/"); // Prepend `.vscode/`
+                }
+
+                // Unwrap the `fileMatch` field (array of glob patterns)
+                let Some(file_match) = schema.get("fileMatch") else {
+                    eprintln!("`fileMatch` field not found in schema");
+                    return None;
+                };
+                let Value::Array(file_match) = file_match else {
+                    eprintln!("`fileMatch` field is not an array");
+                    return None;
+                };
+                let patterns = file_match
+                    .iter()
+                    .filter_map(|pattern| {
+                        let Value::String(pattern) = pattern else {
+                            eprintln!("`fileMatch` field contains non-string element");
+                            return None;
+                        };
+                        Some(pattern.to_string())
+                    })
+                    .collect::<Vec<_>>();
+
+                // Create a GlobWalker for given patterns
+                let builder = GlobWalkerBuilder::from_patterns(".", &patterns);
+
+                // Return instances as a tuple of schema path and instance path
+                let instances = builder
+                    .build()
+                    .expect("Failed to build GlobWalker")
                     .filter_map(Result::ok)
                     .filter_map(move |instance_path| {
-                        let instance_path = instance_path.to_str().unwrap().to_string();
+                        let instance_path = instance_path.path().to_str().unwrap().to_string();
                         Some((schema_path.clone(), instance_path))
                     });
                 Some(instances)

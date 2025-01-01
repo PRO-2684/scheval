@@ -22,10 +22,14 @@ Note that `vscode` are not supported yet.
 
 ## TODO
 
-- [x] Implement `vscode` auto detection
-- [ ] Better support for `fileMatch`
+- [ ] Implement `vscode` auto detection
+  - [x] Better support for `fileMatch`
+    - [x] Relative path
+    - [x] Absolute path (workspace)
+  - [ ] Support for URLs in `url` field
 - [ ] Adding more tests
 - [ ] Better error handling
+- [ ] Handle output in `main.rs`
 - [ ] Improve performance using references
 - [ ] Possibly adding more features
 - [ ] Auto release and publish using GitHub Actions

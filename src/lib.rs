@@ -88,6 +88,7 @@ pub fn run(config: &Config) -> Result<bool, Box<dyn std::error::Error>> {
         let feature = features::Vscode;
         let instances = feature.get_instances().collect::<Vec<_>>();
         for (schema_path, instance_path) in instances {
+            println!("Validating {instance_path} against {schema_path}");
             success &= validate_instance(&Path::new(&instance_path), &Path::new(&schema_path))?;
         }
     }
@@ -95,6 +96,7 @@ pub fn run(config: &Config) -> Result<bool, Box<dyn std::error::Error>> {
         let feature = features::Suffix;
         let instances = feature.get_instances().collect::<Vec<_>>();
         for (schema_path, instance_path) in instances {
+            println!("Validating {instance_path} against {schema_path}");
             success &= validate_instance(&Path::new(&instance_path), &Path::new(&schema_path))?;
         }
     }
