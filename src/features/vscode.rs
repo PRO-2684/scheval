@@ -75,9 +75,6 @@ impl Feature for Vscode {
             if schema_path.starts_with('/') {
                 // Relative to workspace root
                 schema_path.remove(0); // Remove leading `/`
-            } else {
-                // Relative to `.vscode` directory
-                schema_path.insert_str(0, ".vscode/"); // Prepend `.vscode/`
             }
             let schema_path = Path::new(&schema_path);
             let Ok(schema_path) = schema_path.canonicalize() else {
