@@ -1,0 +1,31 @@
+{
+    "json.schemas": [
+        { // Testing local schema
+            "fileMatch": [
+                "**/*.foo.json"
+            ],
+            "url": "./foo_schema.json"
+        },
+        { // Testing inline schema
+            "fileMatch": [
+                "/.myconfig"
+            ],
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the entry"
+                    }
+                }
+            }
+        },
+        { // Testing multiple fileMatch
+            "fileMatch": [
+                "/receipts/*.json",
+                "!/receipts/*.excluded.json"
+            ],
+            "url": "./receipts.schema.json"
+        }
+    ]
+}
