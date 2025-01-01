@@ -26,10 +26,17 @@ Note that `vscode` are not supported yet.
   - [x] Better support for `fileMatch`
     - [x] Relative path
     - [x] Absolute path (workspace)
-  - [ ] Support for URLs in `url` field
-- [ ] Adding more tests
+  - [ ] Better support for `url`
+    - [x] Local schema (path)
+    - [ ] Remote schema (URL)
+    - [ ] Inline schema
+- [ ] Smartly exclude paths
+  - [ ] Respect `.gitignore`
+  - [ ] Ignore paths starting with `.` (hidden files)
+- [ ] Add more tests & documentation
 - [ ] Better error handling
 - [ ] Handle output in `main.rs`
 - [ ] Improve performance using references
 - [ ] Possibly adding more features
+- [ ] [Minimize binary size](https://github.com/johnthagen/min-sized-rust)
 - [ ] Auto release and publish using GitHub Actions

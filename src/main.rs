@@ -9,10 +9,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             } else {
                 Err("Validation failed".into())
             }
-        },
-        Err(err) => {
-            eprintln!("Error: {}", err);
-            Err(err)
         }
+        Err(err) => Err(err),
     }
 }
