@@ -1,4 +1,4 @@
-//! suffix auto detection: Validate `<filename>.json` with `<filename>.schema.json` under working directory.
+//! Suffix auto detection: Validate `<filename>.json` with `<filename>.schema.json` under working directory.
 
 use super::Feature;
 use std::{fs, path::Path};

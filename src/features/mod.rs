@@ -7,5 +7,5 @@ pub trait Feature {
     fn get_instances(&self) -> impl Iterator<Item = (String, String)>;
 }
 
-// pub use vscode::Vscode;
+pub use vscode::Vscode;
 pub use suffix::Suffix;

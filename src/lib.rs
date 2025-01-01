@@ -85,7 +85,11 @@ pub fn validate_instance(
 pub fn run(config: &Config) -> Result<bool, Box<dyn std::error::Error>> {
     let mut success = true;
     if config.vscode {
-        // Dummy
+        let feature = features::Vscode;
+        let instances = feature.get_instances().collect::<Vec<_>>();
+        for (schema_path, instance_path) in instances {
+            success &= validate_instance(&Path::new(&instance_path), &Path::new(&schema_path))?;
+        }
     }
     if config.suffix {
         let feature = features::Suffix;

@@ -22,7 +22,10 @@ Note that `vscode` are not supported yet.
 
 ## TODO
 
-- [ ] Implement `vscode` auto detection
+- [x] Implement `vscode` auto detection
+- [ ] Better support for `fileMatch`
 - [ ] Adding more tests
+- [ ] Better error handling
+- [ ] Improve performance using references
 - [ ] Possibly adding more features
 - [ ] Auto release and publish using GitHub Actions
