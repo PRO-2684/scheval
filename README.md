@@ -1,5 +1,14 @@
 # scheval
 
+[![GitHub License](https://img.shields.io/github/license/PRO-2684/scheval?logo=opensourceinitiative)](https://github.com/PRO-2684/scheval/blob/main/LICENSE)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/PRO-2684/scheval/release.yml?branch=main&logo=githubactions)](https://github.com/PRO-2684/scheval/blob/main/.github/workflows/release.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/PRO-2684/scheval?logo=githubactions)](https://github.com/PRO-2684/scheval/releases)
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/PRO-2684/scheval/total?logo=github)](https://github.com/PRO-2684/scheval/releases)
+[![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/PRO-2684/scheval/latest/total?logo=github)](https://github.com/PRO-2684/scheval/releases/latest)
+[![Crates.io Version](https://img.shields.io/crates/v/scheval?logo=rust)](https://crates.io/crates/scheval)
+[![Crates.io Total Downloads](https://img.shields.io/crates/d/scheval?logo=rust)](https://crates.io/crates/scheval)
+
+
 A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate. Currently still in development.
 
 ## 🚀 Installation
