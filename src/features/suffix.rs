@@ -4,17 +4,21 @@ use super::{Feature, Schema};
 use crate::regularize;
 use std::{collections::{HashMap, HashSet}, fs, path::{Path, PathBuf}};
 
-/// A feature of scheval, capable of finding `<filename>.json` with `<filename>.schema.json` under working directory.
-pub struct Suffix;
+/// A feature of scheval, capable of finding `<filename>.json` with `<filename>.schema.json` under base directory.
+pub struct Suffix {
+    /// Canonicalized path to the base directory.
+    base: PathBuf,
+}
 
 impl Feature for Suffix {
+    fn with_base(base: &str) -> Self {
+        let base = Path::new(base).canonicalize().expect("Failed to canonicalize base directory");
+        Self { base }
+    }
     fn get_associations(&self) -> HashMap<Schema, HashSet<PathBuf>> {
-        let Ok(working_dir) = Path::new(".").canonicalize() else {
-            eprintln!("Failed to canonicalize working directory");
-            return HashMap::new();
-        };
-        let Ok(entries) = fs::read_dir(&working_dir) else {
-            eprintln!("Failed to list working directory");
+        let base = &self.base;
+        let Ok(entries) = fs::read_dir(&base) else {
+            eprintln!("Failed to list base directory");
             return HashMap::new();
         };
         let mut associations = HashMap::new();
@@ -39,13 +43,13 @@ impl Feature for Suffix {
                         eprintln!("Failed to canonicalize schema path `{}`", schema_path.to_string_lossy());
                         continue;
                     };
-                    let schema_path = regularize(&working_dir, &schema_path);
+                    let schema_path = regularize(&base, &schema_path);
                     let schema = Schema::Local(schema_path);
                     let Ok(instance) = path.canonicalize() else {
                         eprintln!("Failed to canonicalize instance path `{}`", path.to_string_lossy());
                         continue;
                     };
-                    let instance = regularize(&working_dir, &instance);
+                    let instance = regularize(&base, &instance);
                     associations.entry(schema).or_insert_with(HashSet::new).insert(instance);
                 }
             }
@@ -57,12 +61,11 @@ impl Feature for Suffix {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_utils::{setup, hashset_of_pathbuf};
+    use crate::test_utils::{TEST_DIR, hashset_of_pathbuf};
 
     #[test]
     fn test_suffix() {
-        let _dir_change = setup();
-        let feature = Suffix;
+        let feature = Suffix::with_base(TEST_DIR);
         let associations = feature.get_associations();
         let expected: HashMap<Schema, HashSet<PathBuf>> = [
             (

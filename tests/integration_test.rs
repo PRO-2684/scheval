@@ -1,11 +1,10 @@
-use scheval::{run, Config, test_utils::setup};
+use scheval::{run, Config, test_utils::TEST_DIR};
 
 #[test]
 fn test_env() {
-    let _dir_change = setup();
-    // List the files in the current directory
-    let entries = std::fs::read_dir(".").expect("Failed to read directory");
-    // Assert that the current directory contains a folder named exactly ".vscode"
+    // List files in test directory
+    let entries = std::fs::read_dir(TEST_DIR).expect("Failed to read directory");
+    // Assert that test directory contains a folder named ".vscode"
     let mut vscode_found = false;
     for entry in entries {
         let entry = entry.expect("Failed to get entry");
@@ -21,11 +20,10 @@ fn test_env() {
 
 #[test]
 fn test_scheval() {
-    let _dir_change = setup();
     let config = Config {
         vscode: true,
         suffix: true,
     };
-    let result = run(&config).expect("Failed to run scheval");
+    let result = run(&config, TEST_DIR).expect("Failed to run scheval");
     assert!(result);
 }

@@ -12,10 +12,13 @@ use std::{
     path::{Path, PathBuf},
 };
 
-pub struct Vscode;
+pub struct Vscode {
+    /// Canonicalized path to the base directory.
+    base: PathBuf,
+}
 
-fn read_schema_associations_from_settings() -> Option<Vec<Value>> {
-    let settings_json = Path::new(".vscode/settings.json");
+fn read_schema_associations_from_settings(base: &Path) -> Option<Vec<Value>> {
+    let settings_json = base.join(".vscode/settings.json");
     if !settings_json.exists() {
         eprintln!("No .vscode/settings.json found");
         return None;
@@ -39,8 +42,8 @@ fn read_schema_associations_from_settings() -> Option<Vec<Value>> {
     Some(association_definitions.to_vec())
 }
 
-/// Get schema from an association definition, **consuming** the definition
-fn get_schema(mut association_definition: Map<String, Value>, working_dir: &Path) -> Option<Schema>  {
+/// Get schema from an association definition relative to `base`, **consuming** the definition
+fn get_schema(mut association_definition: Map<String, Value>, base: &Path) -> Option<Schema>  {
     // Unwrap the `url` or `schema` field (schema path or inline schema)
     let Some(schema_path) = association_definition.get("url") else {
         // If `url` field is not found, try `schema` field
@@ -68,7 +71,7 @@ fn get_schema(mut association_definition: Map<String, Value>, working_dir: &Path
         // Relative to workspace root
         schema_path.remove(0); // Remove leading `/`
     }
-    let schema_path = Path::new(&schema_path);
+    let schema_path = base.join(schema_path);
     let Ok(schema_path) = schema_path.canonicalize() else {
         eprintln!(
             "Failed to canonicalize schema path `{}`",
@@ -76,17 +79,18 @@ fn get_schema(mut association_definition: Map<String, Value>, working_dir: &Path
         );
         return None;
     };
-    let schema_path = regularize(&working_dir, &schema_path);
+    let schema_path = regularize(&base, &schema_path);
     Some(Schema::Local(schema_path))
 }
 
 impl Feature for Vscode {
+    fn with_base(base: &str) -> Self {
+        let base = Path::new(base).canonicalize().expect("Failed to canonicalize base directory");
+        Self { base }
+    }
     fn get_associations(&self) -> HashMap<Schema, HashSet<PathBuf>> {
-        let Ok(working_dir) = Path::new(".").canonicalize() else {
-            eprintln!("Failed to canonicalize working directory");
-            return HashMap::new();
-        };
-        let Some(association_definitions) = read_schema_associations_from_settings() else {
+        let base = &self.base;
+        let Some(association_definitions) = read_schema_associations_from_settings(base) else {
             eprintln!("Failed to get json.schemas as array");
             return HashMap::new();
         };
@@ -127,13 +131,13 @@ impl Feature for Vscode {
                 .collect::<Vec<_>>();
 
             // Unwrap the `url` or `schema` field (schema path or inline schema)
-            let Some(schema) = get_schema(association_definition, &working_dir) else {
+            let Some(schema) = get_schema(association_definition, &base) else {
                 eprintln!("Failed to get schema from association definition");
                 continue;
             };
 
             // Create a GlobWalker for given patterns
-            let builder = GlobWalkerBuilder::from_patterns(".", &patterns);
+            let builder = GlobWalkerBuilder::from_patterns(base, &patterns);
 
             // Collect instances
             let instances = builder
@@ -151,7 +155,7 @@ impl Feature for Vscode {
                         );
                         return None;
                     };
-                    Some(regularize(&working_dir, &path))
+                    Some(regularize(&base, &path))
                 })
                 .collect::<HashSet<_>>();
 
@@ -168,12 +172,11 @@ impl Feature for Vscode {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_utils::{setup, hashset_of_pathbuf};
+    use crate::test_utils::{TEST_DIR, hashset_of_pathbuf};
 
     #[test]
     fn test_vscode() {
-        let _dir_change = setup();
-        let feature = Vscode;
+        let feature = Vscode::with_base(TEST_DIR);
         let associations = feature.get_associations();
         let expected: HashMap<Schema, HashSet<PathBuf>> = [
             (

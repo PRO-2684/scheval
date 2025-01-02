@@ -1,5 +1,5 @@
 pub mod test_utils;
-mod features;
+pub mod features;
 use clap::Parser;
 use features::Feature;
 use serde_json::Value;
@@ -62,10 +62,14 @@ pub enum Schema {
 
 impl Schema {
     /// Resolve the schema to a JSON value, **consuming `self`**.
-    fn resolve(self) -> Result<Value, Box<dyn std::error::Error>> {
+    fn resolve(self, base: &Path) -> Result<Value, Box<dyn std::error::Error>> {
         use Schema::*;
         match self {
-            Local(path) => Ok(read_json(&path)??),
+            Local(path) => {
+                let path = base.join(path);
+                let json = read_json(&path)??;
+                Ok(json)
+            }
             Remote(_) => Err("Remote schema is not supported yet".into()),
             Inline(value) => Ok(value),
         }
@@ -146,23 +150,25 @@ fn extend(
 // Main Logic
 
 /// Run scheval with given configuration.
-pub fn run(config: &Config) -> Result<bool, Box<dyn std::error::Error>> {
+pub fn run(config: &Config, base: &str) -> Result<bool, Box<dyn std::error::Error>> {
     let mut success = true;
     let mut associations = HashMap::new();
     if config.vscode {
-        let feature = features::Vscode;
+        let feature = features::Vscode::with_base(base);
         let vscode_associations = feature.get_associations();
         extend(&mut associations, vscode_associations);
     }
     if config.suffix {
-        let feature = features::Suffix;
+        let feature = features::Suffix::with_base(base);
         let suffix_associations = feature.get_associations();
         extend(&mut associations, suffix_associations);
     }
+    let base = Path::new(base);
     for (schema, instances) in associations {
         println!("Schema `{schema}`:");
-        let schema_json = schema.resolve()?;
+        let schema_json = schema.resolve(base)?;
         for instance in instances {
+            let instance = base.join(instance);
             let valid = validate_instance(&instance, &schema_json)?;
             success &= valid;
         }

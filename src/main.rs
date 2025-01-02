@@ -2,7 +2,7 @@ use scheval::{get_config, run};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = get_config();
-    match run(&args) {
+    match run(&args, ".") {
         Ok(success) => {
             if success {
                 Ok(())
