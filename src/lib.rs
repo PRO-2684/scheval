@@ -1,7 +1,7 @@
 pub mod test_utils;
-pub mod features;
+pub mod include;
 use clap::Parser;
-use features::Feature;
+use include::Include;
 use serde_json::Value;
 use std::{
     collections::{HashMap, HashSet},
@@ -154,12 +154,12 @@ pub fn run(config: &Config, base: &str) -> Result<bool, Box<dyn std::error::Erro
     let mut success = true;
     let mut associations = HashMap::new();
     if config.vscode {
-        let feature = features::Vscode::with_base(base);
+        let feature = include::Vscode::with_base(base);
         let vscode_associations = feature.get_associations();
         extend(&mut associations, vscode_associations);
     }
     if config.suffix {
-        let feature = features::Suffix::with_base(base);
+        let feature = include::Suffix::with_base(base);
         let suffix_associations = feature.get_associations();
         extend(&mut associations, suffix_associations);
     }

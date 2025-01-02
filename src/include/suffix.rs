@@ -1,16 +1,16 @@
 //! Suffix auto detection: Validate `<filename>.json` with `<filename>.schema.json` under working directory.
 
-use super::{Feature, Schema};
+use super::{Include, Schema};
 use crate::regularize;
 use std::{collections::{HashMap, HashSet}, fs, path::{Path, PathBuf}};
 
-/// A feature of scheval, capable of finding `<filename>.json` with `<filename>.schema.json` under base directory.
+/// A smart including feature of scheval, capable of finding `<filename>.json` with `<filename>.schema.json` under base directory.
 pub struct Suffix {
     /// Canonicalized path to the base directory.
     base: PathBuf,
 }
 
-impl Feature for Suffix {
+impl Include for Suffix {
     fn with_base(base: &str) -> Self {
         let base = Path::new(base).canonicalize().expect("Failed to canonicalize base directory");
         Self { base }

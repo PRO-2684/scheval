@@ -10,8 +10,8 @@ use std::{
 pub use suffix::Suffix;
 pub use vscode::Vscode;
 
-/// A feature of scheval that is capable of finding JSON instances and their corresponding schemas.
-pub trait Feature {
+/// A smart including feature of scheval that is capable of finding JSON instances and their corresponding schemas.
+pub trait Include {
     /// Create a new instance of the feature.
     fn new() -> Self
     where

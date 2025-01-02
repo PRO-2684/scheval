@@ -1,7 +1,7 @@
 //! VSCode auto detection: Respect `json.schemas` field at `.vscode/settings.json` if present
 // https://code.visualstudio.com/docs/languages/json#_json-schemas-and-settings
 
-use super::{Feature, Schema};
+use super::{Include, Schema};
 use crate::regularize;
 use globwalk::GlobWalkerBuilder;
 use jsonc_parser::parse_to_serde_value;
@@ -12,6 +12,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+/// A smart including feature of scheval, capable of respecting `json.schemas` field at `.vscode/settings.json` if present.
 pub struct Vscode {
     /// Canonicalized path to the base directory.
     base: PathBuf,
@@ -83,7 +84,7 @@ fn get_schema(mut association_definition: Map<String, Value>, base: &Path) -> Op
     Some(Schema::Local(schema_path))
 }
 
-impl Feature for Vscode {
+impl Include for Vscode {
     fn with_base(base: &str) -> Self {
         let base = Path::new(base).canonicalize().expect("Failed to canonicalize base directory");
         Self { base }
@@ -91,7 +92,6 @@ impl Feature for Vscode {
     fn get_associations(&self) -> HashMap<Schema, HashSet<PathBuf>> {
         let base = &self.base;
         let Some(association_definitions) = read_schema_associations_from_settings(base) else {
-            eprintln!("Failed to get json.schemas as array");
             return HashMap::new();
         };
         let mut associations = HashMap::new();
