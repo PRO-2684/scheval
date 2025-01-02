@@ -13,6 +13,7 @@ sed -i "s/^version = \".*\"/version = \"$VERSION\"/" Cargo.toml
 
 # Commit the change
 git add Cargo.toml
+cargo generate-lockfile
 git commit -m "Bump version to v$VERSION"
 
 # Tag
