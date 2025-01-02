@@ -53,3 +53,23 @@ impl Feature for Suffix {
         associations
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_utils::{setup, hashset_of_pathbuf};
+
+    #[test]
+    fn test_suffix() {
+        let _dir_change = setup();
+        let feature = Suffix;
+        let associations = feature.get_associations();
+        let expected: HashMap<Schema, HashSet<PathBuf>> = [
+            (
+                Schema::Local(PathBuf::from("receipts.schema.json")),
+                hashset_of_pathbuf(&["receipts.json"]),
+            )
+        ].into();
+        assert_eq!(associations, expected);
+    }
+}

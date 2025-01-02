@@ -1,3 +1,4 @@
+pub mod test_utils;
 mod features;
 use clap::Parser;
 use features::Feature;

@@ -164,3 +164,39 @@ impl Feature for Vscode {
         return associations;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_utils::{setup, hashset_of_pathbuf};
+
+    #[test]
+    fn test_vscode() {
+        let _dir_change = setup();
+        let feature = Vscode;
+        let associations = feature.get_associations();
+        let expected: HashMap<Schema, HashSet<PathBuf>> = [
+            (
+                Schema::Local(PathBuf::from("foo_schema.json")),
+                hashset_of_pathbuf(&["nested1/nested2/abc.foo.json"]),
+            ),
+            (
+                Schema::Inline(serde_json::json!({
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the entry"
+                        }
+                    }
+                })),
+                hashset_of_pathbuf(&[".myconfig"]),
+            ),
+            (
+                Schema::Local(PathBuf::from("receipts.schema.json")),
+                hashset_of_pathbuf(&["receipts/1.json", "receipts/2.json"]),
+            )
+        ].into();
+        assert_eq!(associations, expected);
+    }
+}
