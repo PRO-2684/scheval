@@ -2,6 +2,51 @@
 
 A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate. Currently still in development.
 
+## Installation
+
+<!-- TODO: Add `cargo-binstall` support -->
+<!-- If you have `cargo-binstall`, you can install this tool by running:
+
+```shell
+$ cargo binstall scheval
+```
+
+Otherwise, you can install it using `cargo`: -->
+
+```shell
+$ cargo install scheval
+```
+
+## Features
+
+### Including
+
+- `vscode`: Respect `json.schemas` field at `.vscode/settings.json` if present
+- `suffix`: Validate `<filename>.json` with `<filename>.schema.json` under working directory
+
+### Excluding
+
+TBD
+
+## Quick Start
+
+`scheval` can be run without any arguments. It will automatically use all available features.
+
+```shell
+$ scheval
+```
+
+Alternatively, you can specify a list of smart including features to use:
+
+```shell
+$ scheval --include vscode # Uses only `vscode`
+$ scheval --include suffix # Uses only `suffix`
+$ scheval --include vscode --include suffix # Uses both `vscode` and `suffix`
+$ # Shorthands provided by `clap`
+$ scheval -i vscode -i suffix
+$ scheval -ivscode -isuffix
+```
+
 ## Usage
 
 ```shell
@@ -17,9 +62,6 @@ Options:
           - `vscode`: Respect `json.schemas` field at `.vscode/settings.json` if present
           - `suffix`: Validate `<filename>.json` with `<filename>.schema.json` under working directory
 
-  -e, --exclude <EXCLUDE>
-          What smart excluding features to use. Available: TBD
-
   -h, --help
           Print help (see a summary with '-h')
 
@@ -27,16 +69,19 @@ Options:
           Print version
 ```
 
-Note that `vscode` are not supported yet.
-
 ## Notes
 
 This project uses [`globwalk`](https://github.com/Gilnaa/globwalk) for pattern matching, which might be buggy. Notably in `fileMatch` field:
 
-- `./` is not supported (I've included a quick fix by removing the prefix, but not considering other cases, like `././` or `!./`)
+- `./` is not supported (I've included a quick fix by removing the prefix, but have not considered other cases, like `././` or `!./`)
 - `../` is not supported (A warning will be shown, and the pattern will be ignored)
 
 If you have a good alternative which supports [VSCode's `fileMatch` syntax](https://code.visualstudio.com/docs/languages/json#_file-match-syntax), please let me know.
+
+Possible alternatives:
+
+- [globset](https://docs.rs/globset/0.4.15/globset/)
+- [ignore](https://docs.rs/ignore/latest/ignore/struct.WalkBuilder.html)
 
 ## TODO
 
@@ -49,12 +94,12 @@ If you have a good alternative which supports [VSCode's `fileMatch` syntax](http
     - [ ] Remote schema (URL)
   - [x] Support for `schema` (Inline schema)
 - [ ] Smartly exclude paths
-  - [ ] Respect `.gitignore`
-  - [ ] Ignore paths starting with `.` (hidden files)
 - [ ] Add more tests & documentation
 - [ ] Better error handling
 - [ ] Handle output in `main.rs`
 - [ ] Improve performance using references
 - [ ] Possibly adding more features
 - [ ] [Minimize binary size](https://github.com/johnthagen/min-sized-rust)
-- [ ] Auto release and publish using GitHub Actions
+- [ ] Automation using GitHub Actions
+  - [ ] Release (respecting `cargo-binstall`)
+  - [ ] Publish

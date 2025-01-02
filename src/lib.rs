@@ -23,9 +23,9 @@ struct Args {
     /// - `suffix`: Validate `<filename>.json` with `<filename>.schema.json` under working directory
     #[arg(short, long, verbatim_doc_comment)]
     include: Vec<String>,
-    /// What smart excluding features to use. Available: TBD
-    #[arg(short, long)]
-    exclude: Vec<String>,
+    // /// What smart excluding features to use. Available: TBD
+    // #[arg(short, long)]
+    // exclude: Vec<String>,
 }
 
 /// Configuration options. (Simple wrapper around `Args`)
@@ -154,13 +154,13 @@ pub fn run(config: &Config, base: &str) -> Result<bool, Box<dyn std::error::Erro
     let mut success = true;
     let mut associations = HashMap::new();
     if config.vscode {
-        let feature = include::Vscode::with_base(base);
-        let vscode_associations = feature.get_associations();
+        let inc = include::Vscode::with_base(base);
+        let vscode_associations = inc.get_associations();
         extend(&mut associations, vscode_associations);
     }
     if config.suffix {
-        let feature = include::Suffix::with_base(base);
-        let suffix_associations = feature.get_associations();
+        let inc = include::Suffix::with_base(base);
+        let suffix_associations = inc.get_associations();
         extend(&mut associations, suffix_associations);
     }
     let base = Path::new(base);

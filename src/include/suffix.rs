@@ -65,8 +65,8 @@ mod tests {
 
     #[test]
     fn test_suffix() {
-        let feature = Suffix::with_base(TEST_DIR);
-        let associations = feature.get_associations();
+        let inc = Suffix::with_base(TEST_DIR);
+        let associations = inc.get_associations();
         let expected: HashMap<Schema, HashSet<PathBuf>> = [
             (
                 Schema::Local(PathBuf::from("receipts.schema.json")),

@@ -176,8 +176,8 @@ mod tests {
 
     #[test]
     fn test_vscode() {
-        let feature = Vscode::with_base(TEST_DIR);
-        let associations = feature.get_associations();
+        let inc = Vscode::with_base(TEST_DIR);
+        let associations = inc.get_associations();
         let expected: HashMap<Schema, HashSet<PathBuf>> = [
             (
                 Schema::Local(PathBuf::from("foo_schema.json")),
