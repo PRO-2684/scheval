@@ -1,4 +1,6 @@
-use scheval::{run, Config, test_utils::TEST_DIR};
+use scheval::{run, Config};
+
+const TEST_DIR: &str = "tests/data";
 
 #[test]
 fn test_env() {

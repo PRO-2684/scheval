@@ -1,4 +1,3 @@
-pub mod test_utils;
 pub mod include;
 use clap::Parser;
 use include::Include;
@@ -10,6 +9,9 @@ use std::{
     io::BufReader,
     path::{Path, PathBuf},
 };
+
+#[cfg(test)]
+mod test_utils;
 
 // Arguments & Configuration
 
