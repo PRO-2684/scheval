@@ -2,22 +2,21 @@
 
 A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate. Currently still in development.
 
-## Installation
+## 🚀 Installation
 
-<!-- TODO: Add `cargo-binstall` support -->
-<!-- If you have `cargo-binstall`, you can install this tool by running:
+If you have `cargo-binstall`, you can install this tool by running:
 
 ```shell
 $ cargo binstall scheval
 ```
 
-Otherwise, you can install it using `cargo`: -->
+Otherwise, you can install it from source:
 
 ```shell
 $ cargo install scheval
 ```
 
-## Features
+## ✨ Features
 
 ### Including
 
@@ -28,7 +27,7 @@ $ cargo install scheval
 
 TBD
 
-## Quick Start
+## 🚀 Quick Start
 
 `scheval` can be run without any arguments. It will automatically use all available features.
 
@@ -47,7 +46,7 @@ $ scheval -i vscode -i suffix
 $ scheval -ivscode -isuffix
 ```
 
-## Usage
+## 📚 Usage
 
 ```shell
 $ scheval --help
@@ -69,7 +68,7 @@ Options:
           Print version
 ```
 
-## Notes
+## 📝 Notes
 
 This project uses [`globwalk`](https://github.com/Gilnaa/globwalk) for pattern matching, which might be buggy. Notably in `fileMatch` field:
 
@@ -80,8 +79,8 @@ If you have a good alternative which supports [VSCode's `fileMatch` syntax](http
 
 Possible alternatives:
 
-- [globset](https://docs.rs/globset/0.4.15/globset/)
-- [ignore](https://docs.rs/ignore/latest/ignore/struct.WalkBuilder.html)
+- [globset](https://docs.rs/globset/)
+- [ignore](https://docs.rs/ignore/)
 
 ## TODO
 
@@ -89,7 +88,7 @@ Possible alternatives:
   - [x] Better support for `fileMatch`
     - [x] Relative path
     - [x] Absolute path (workspace)
-  - [ ] Better support for `url`
+  - [ ] Support for `url`
     - [x] Local schema (path)
     - [ ] Remote schema (URL)
   - [x] Support for `schema` (Inline schema)
@@ -100,6 +99,6 @@ Possible alternatives:
 - [ ] Improve performance using references
 - [ ] Possibly adding more features
 - [ ] [Minimize binary size](https://github.com/johnthagen/min-sized-rust)
-- [ ] Automation using GitHub Actions
-  - [ ] Release (respecting `cargo-binstall`)
-  - [ ] Publish
+- [x] Automation using GitHub Actions
+  - [x] Release (respecting `cargo-binstall`)
+  - [x] Publish

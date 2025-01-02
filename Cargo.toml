@@ -15,3 +15,12 @@ globwalk = "0.9.1"
 jsonc-parser = { version = "0.26.2", features = ["serde"] }
 jsonschema = "0.26.2"
 serde_json = "1.0.134"
+
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }{ archive-suffix }"
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
+disabled-strategies = ["quick-install"]
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-fmt = "zip"
