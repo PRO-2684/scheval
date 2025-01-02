@@ -98,7 +98,7 @@ Possible alternatives:
 - [ ] Handle output in `main.rs`
 - [ ] Improve performance using references
 - [ ] Possibly adding more features
-- [ ] [Minimize binary size](https://github.com/johnthagen/min-sized-rust)
+- [x] [Reduce binary size](https://github.com/johnthagen/min-sized-rust)
 - [x] Automation using GitHub Actions
   - [x] Release (respecting `cargo-binstall`)
   - [x] Publish
