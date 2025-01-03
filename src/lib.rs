@@ -96,29 +96,20 @@ fn read_json(path: &Path) -> Result<serde_json::Result<Value>, Box<dyn Error>> {
 }
 
 /// Validate a JSON instance against a JSON Schema.
-pub fn validate_instance(instance: &Path, schema_json: &Value) -> Result<bool, Box<dyn Error>> {
+pub fn validate_instance(validator: &jsonschema::Validator, instance: &Path) -> Result<bool, Box<dyn Error>> {
     let mut success = true;
-
-    match jsonschema::validator_for(schema_json) {
-        Ok(validator) => {
-            let instance_json = read_json(instance)??;
-            let mut errors = validator.iter_errors(&instance_json);
-            let filename = instance.to_string_lossy();
-            if let Some(first) = errors.next() {
-                success = false;
-                println!("- `{filename}` - {FAILURE}INVALID{FAILURE:#}. Errors:");
-                println!("  1. {first}");
-                for (i, error) in errors.enumerate() {
-                    println!("  {}. {error}", i + 2);
-                }
-            } else {
-                println!("- `{filename}` - {SUCCESS}VALID{SUCCESS:#}");
-            }
+    let instance_json = read_json(instance)??;
+    let mut errors = validator.iter_errors(&instance_json);
+    let filename = instance.to_string_lossy();
+    if let Some(first) = errors.next() {
+        success = false;
+        println!("- `{filename}` - {FAILURE}INVALID{FAILURE:#}. Errors:");
+        println!("  1. {first}");
+        for (i, error) in errors.enumerate() {
+            println!("  {}. {error}", i + 2);
         }
-        Err(error) => {
-            println!("{FAILURE}Invalid schema{FAILURE:#}: {error}");
-            success = false;
-        }
+    } else {
+        println!("- `{filename}` - {SUCCESS}VALID{SUCCESS:#}");
     }
     Ok(success)
 }
@@ -166,9 +157,17 @@ pub fn run(config: &Config, base: &str) -> Result<bool, Box<dyn Error>> {
     for (schema, instances) in associations {
         println!("Schema `{schema}`:");
         let schema_json = schema.resolve(base)?;
+        let validator = match jsonschema::validator_for(&schema_json) {
+            Ok(validator) => validator,
+            Err(error) => {
+                println!("{FAILURE}Invalid schema{FAILURE:#}: {error}\n");
+                success = false;
+                continue;
+            }
+        };
         for instance in instances {
             let instance = base.join(instance);
-            let valid = validate_instance(&instance, &schema_json)?;
+            let valid = validate_instance(&validator, &instance)?;
             success &= valid;
         }
         println!();
