@@ -8,7 +8,6 @@
 [![Crates.io Version](https://img.shields.io/crates/v/scheval?logo=rust)](https://crates.io/crates/scheval)
 [![Crates.io Total Downloads](https://img.shields.io/crates/d/scheval?logo=rust)](https://crates.io/crates/scheval)
 
-
 A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate. Currently still in development.
 
 ## 🚀 Installation
@@ -104,7 +103,10 @@ Possible alternatives:
 - [ ] Smartly exclude paths
 - [ ] Add more tests & documentation
 - [ ] Better error handling
-- [ ] Handle output in `main.rs`
+- [ ] Output
+  - [ ] Handle output in `main.rs`
+  - [ ] Use commandline argument `--verbose` for increased verbosity
+  - [ ] Colorize output (https://docs.rs/anstyle or https://docs.rs/colored)
 - [ ] Improve performance using references
 - [ ] Possibly adding more features
 - [x] [Reduce binary size](https://github.com/johnthagen/min-sized-rust)

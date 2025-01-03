@@ -5,7 +5,7 @@ use super::{Include, Schema};
 use crate::regularize;
 use globwalk::GlobWalkerBuilder;
 use jsonc_parser::parse_to_serde_value;
-use serde_json::{Value, Map};
+use serde_json::{Map, Value};
 use std::{
     collections::{HashMap, HashSet},
     fs,
@@ -18,6 +18,7 @@ pub struct Vscode {
     base: PathBuf,
 }
 
+/// Read `json.schemas` field from `.vscode/settings.json` at `base`
 fn read_schema_associations_from_settings(base: &Path) -> Option<Vec<Value>> {
     let settings_json = base.join(".vscode/settings.json");
     if !settings_json.exists() {
@@ -44,7 +45,7 @@ fn read_schema_associations_from_settings(base: &Path) -> Option<Vec<Value>> {
 }
 
 /// Get schema from an association definition relative to `base`, **consuming** the definition
-fn get_schema(mut association_definition: Map<String, Value>, base: &Path) -> Option<Schema>  {
+fn get_schema(mut association_definition: Map<String, Value>, base: &Path) -> Option<Schema> {
     // Unwrap the `url` or `schema` field (schema path or inline schema)
     let Some(schema_path) = association_definition.get("url") else {
         // If `url` field is not found, try `schema` field
@@ -52,7 +53,8 @@ fn get_schema(mut association_definition: Map<String, Value>, base: &Path) -> Op
             eprintln!("Neither `url` nor `schema` field found in schema");
             return None;
         };
-        let Value::Object(_) = schema else { // Check if `schema` is an object
+        let Value::Object(_) = schema else {
+            // Check if `schema` is an object
             eprintln!("`schema` field is not an object");
             return None;
         };
@@ -86,7 +88,9 @@ fn get_schema(mut association_definition: Map<String, Value>, base: &Path) -> Op
 
 impl Include for Vscode {
     fn with_base(base: &str) -> Self {
-        let base = Path::new(base).canonicalize().expect("Failed to canonicalize base directory");
+        let base = Path::new(base)
+            .canonicalize()
+            .expect("Failed to canonicalize base directory");
         Self { base }
     }
     fn get_associations(&self) -> HashMap<Schema, HashSet<PathBuf>> {
@@ -172,7 +176,7 @@ impl Include for Vscode {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests_util::{TEST_DIR, hashset_of_pathbuf};
+    use crate::tests_util::{hashset_of_pathbuf, TEST_DIR};
 
     #[test]
     fn test_vscode() {
@@ -198,8 +202,9 @@ mod tests {
             (
                 Schema::Local(PathBuf::from("receipts.schema.json")),
                 hashset_of_pathbuf(&["receipts/1.json", "receipts/2.json"]),
-            )
-        ].into();
+            ),
+        ]
+        .into();
         assert_eq!(associations, expected);
     }
 }

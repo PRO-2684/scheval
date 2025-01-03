@@ -2,7 +2,11 @@
 
 use super::{Include, Schema};
 use crate::regularize;
-use std::{collections::{HashMap, HashSet}, fs, path::{Path, PathBuf}};
+use std::{
+    collections::{HashMap, HashSet},
+    fs,
+    path::{Path, PathBuf},
+};
 
 /// A smart including feature of scheval, capable of finding `<filename>.json` with `<filename>.schema.json` under base directory.
 pub struct Suffix {
@@ -12,7 +16,9 @@ pub struct Suffix {
 
 impl Include for Suffix {
     fn with_base(base: &str) -> Self {
-        let base = Path::new(base).canonicalize().expect("Failed to canonicalize base directory");
+        let base = Path::new(base)
+            .canonicalize()
+            .expect("Failed to canonicalize base directory");
         Self { base }
     }
     fn get_associations(&self) -> HashMap<Schema, HashSet<PathBuf>> {
@@ -40,17 +46,26 @@ impl Include for Suffix {
                 let schema_path = path.with_extension("schema.json");
                 if schema_path.exists() {
                     let Ok(schema_path) = schema_path.canonicalize() else {
-                        eprintln!("Failed to canonicalize schema path `{}`", schema_path.to_string_lossy());
+                        eprintln!(
+                            "Failed to canonicalize schema path `{}`",
+                            schema_path.to_string_lossy()
+                        );
                         continue;
                     };
                     let schema_path = regularize(&base, &schema_path);
                     let schema = Schema::Local(schema_path);
                     let Ok(instance) = path.canonicalize() else {
-                        eprintln!("Failed to canonicalize instance path `{}`", path.to_string_lossy());
+                        eprintln!(
+                            "Failed to canonicalize instance path `{}`",
+                            path.to_string_lossy()
+                        );
                         continue;
                     };
                     let instance = regularize(&base, &instance);
-                    associations.entry(schema).or_insert_with(HashSet::new).insert(instance);
+                    associations
+                        .entry(schema)
+                        .or_insert_with(HashSet::new)
+                        .insert(instance);
                 }
             }
         }
@@ -61,18 +76,17 @@ impl Include for Suffix {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests_util::{TEST_DIR, hashset_of_pathbuf};
+    use crate::tests_util::{hashset_of_pathbuf, TEST_DIR};
 
     #[test]
     fn test_suffix() {
         let inc = Suffix::with_base(TEST_DIR);
         let associations = inc.get_associations();
-        let expected: HashMap<Schema, HashSet<PathBuf>> = [
-            (
-                Schema::Local(PathBuf::from("receipts.schema.json")),
-                hashset_of_pathbuf(&["receipts.json"]),
-            )
-        ].into();
+        let expected: HashMap<Schema, HashSet<PathBuf>> = [(
+            Schema::Local(PathBuf::from("receipts.schema.json")),
+            hashset_of_pathbuf(&["receipts.json"]),
+        )]
+        .into();
         assert_eq!(associations, expected);
     }
 }

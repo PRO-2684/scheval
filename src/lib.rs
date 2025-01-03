@@ -4,6 +4,7 @@ use include::Include;
 use serde_json::Value;
 use std::{
     collections::{HashMap, HashSet},
+    error::Error,
     fmt::Display,
     fs::File,
     io::BufReader,
@@ -61,7 +62,7 @@ pub enum Schema {
 
 impl Schema {
     /// Resolve the schema to a JSON value, **consuming `self`**.
-    fn resolve(self, base: &Path) -> Result<Value, Box<dyn std::error::Error>> {
+    fn resolve(self, base: &Path) -> Result<Value, Box<dyn Error>> {
         use Schema::*;
         match self {
             Local(path) => {
@@ -86,17 +87,14 @@ impl Display for Schema {
 }
 
 /// Read JSON file from given path.
-fn read_json(path: &Path) -> Result<serde_json::Result<Value>, Box<dyn std::error::Error>> {
+fn read_json(path: &Path) -> Result<serde_json::Result<Value>, Box<dyn Error>> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     Ok(serde_json::from_reader(reader))
 }
 
 /// Validate a JSON instance against a JSON Schema.
-pub fn validate_instance(
-    instance: &Path,
-    schema_json: &Value,
-) -> Result<bool, Box<dyn std::error::Error>> {
+pub fn validate_instance(instance: &Path, schema_json: &Value) -> Result<bool, Box<dyn Error>> {
     let mut success = true;
 
     match jsonschema::validator_for(schema_json) {
@@ -149,7 +147,7 @@ fn extend(
 // Main Logic
 
 /// Run scheval with given configuration.
-pub fn run(config: &Config, base: &str) -> Result<bool, Box<dyn std::error::Error>> {
+pub fn run(config: &Config, base: &str) -> Result<bool, Box<dyn Error>> {
     let mut success = true;
     let mut associations = HashMap::new();
     if config.vscode {
