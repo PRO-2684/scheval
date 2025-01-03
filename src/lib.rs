@@ -10,9 +10,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-#[cfg(test)]
-mod test_utils;
-
 // Arguments & Configuration
 
 /// Command line arguments.
@@ -176,4 +173,17 @@ pub fn run(config: &Config, base: &str) -> Result<bool, Box<dyn std::error::Erro
         }
     }
     Ok(success)
+}
+
+#[cfg(test)]
+pub(crate) mod tests_util {
+    use std::path::PathBuf;
+
+    /// Public constant for the path to the test data directory.
+    pub const TEST_DIR: &str = "tests/data";
+
+    /// Create a hashset of PathBuf from a list of paths.
+    pub fn hashset_of_pathbuf(paths: &[&str]) -> std::collections::HashSet<PathBuf> {
+        paths.iter().map(|p| PathBuf::from(p)).collect()
+    }
 }

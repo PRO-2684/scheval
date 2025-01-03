@@ -61,7 +61,7 @@ impl Include for Suffix {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_utils::{TEST_DIR, hashset_of_pathbuf};
+    use crate::tests_util::{TEST_DIR, hashset_of_pathbuf};
 
     #[test]
     fn test_suffix() {
