@@ -106,7 +106,7 @@ Possible alternatives:
 - [ ] Output
   - [ ] Handle output in `main.rs`
   - [ ] Use commandline argument `--verbose` for increased verbosity
-  - [ ] Colorize output (https://docs.rs/anstyle or https://docs.rs/colored)
+  - [x] Colorize output (https://docs.rs/anstyle or https://docs.rs/colored)
 - [ ] Improve performance using references
 - [ ] Possibly adding more features
 - [x] [Reduce binary size](https://github.com/johnthagen/min-sized-rust)
