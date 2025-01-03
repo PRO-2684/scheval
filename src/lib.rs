@@ -18,7 +18,7 @@ use std::{
 
 /// Command line arguments.
 #[derive(Parser, Debug)]
-#[command(version, about = "A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate.", long_about = None, styles = STYLE)]
+#[command(version, about = format!("A fast and {ITALIC}*smart*{ITALIC:#} command-line tool for JSON Schema validation, powered by the {UNDERLINE}`jsonschema`{UNDERLINE:#} crate."), long_about = None, styles = CLAP_STYLE)]
 struct Args {
     /// What smart including features to use. Available: `vscode`, `suffix`. Default to all
     ///
@@ -195,14 +195,18 @@ pub(crate) mod tests_util {
 // Styling
 
 // Colors for success and failure messages
+/// ANSI color for green
 const GREEN: Color = Color::Ansi(AnsiColor::Green);
+/// ANSI color for red
 const RED: Color = Color::Ansi(AnsiColor::Red);
+/// Style for success messages
 const SUCCESS: Style = Style::new().fg_color(Some(GREEN)).bold();
+/// Style for failure messages
 const FAILURE: Style = Style::new().fg_color(Some(RED)).bold();
 
-/// Styling for clap arguments
+/// Styling for clap help messages
 // Adapted from https://github.com/8LWXpg/ptr/blob/83aa1d1814ec98d7854e1f4df52d66b8172f6eda/src/main.rs#L124-L131
-const STYLE: Styles = clap::builder::Styles::styled()
+const CLAP_STYLE: Styles = clap::builder::Styles::styled()
     .usage(AnsiColor::BrightGreen.on_default())
     .header(AnsiColor::BrightGreen.on_default())
     .literal(AnsiColor::BrightCyan.on_default())
@@ -210,3 +214,7 @@ const STYLE: Styles = clap::builder::Styles::styled()
     .error(AnsiColor::BrightRed.on_default().bold())
     .valid(AnsiColor::BrightGreen.on_default())
     .placeholder(AnsiColor::Cyan.on_default());
+/// Italic style
+const ITALIC: Style = Style::new().italic();
+/// Dotted-underline style
+const UNDERLINE: Style = Style::new().effects(clap::builder::styling::Effects::DOTTED_UNDERLINE);
