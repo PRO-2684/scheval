@@ -1012,7 +1012,6 @@ name = "scheval"
 version = "0.1.2"
 dependencies = [
  "anstream",
- "anstyle",
  "clap",
  "globwalk",
  "jsonc-parser",

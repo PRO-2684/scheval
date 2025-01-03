@@ -1,7 +1,8 @@
 pub mod include;
-use anstream::println;
-use anstyle::{Style, Color, AnsiColor};
-use clap::Parser;
+use clap::{
+    builder::styling::{AnsiColor, Color, Style, Styles},
+    Parser,
+};
 use include::Include;
 use serde_json::Value;
 use std::{
@@ -17,7 +18,7 @@ use std::{
 
 /// Command line arguments.
 #[derive(Parser, Debug)]
-#[command(version, about = "A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate.", long_about = None)]
+#[command(version, about = "A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate.", long_about = None, styles = STYLE)]
 struct Args {
     /// What smart including features to use. Available: `vscode`, `suffix`. Default to all
     ///
@@ -96,7 +97,10 @@ fn read_json(path: &Path) -> Result<serde_json::Result<Value>, Box<dyn Error>> {
 }
 
 /// Validate a JSON instance against a JSON Schema.
-pub fn validate_instance(validator: &jsonschema::Validator, instance: &Path) -> Result<bool, Box<dyn Error>> {
+pub fn validate_instance(
+    validator: &jsonschema::Validator,
+    instance: &Path,
+) -> Result<bool, Box<dyn Error>> {
     let mut success = true;
     let instance_json = read_json(instance)??;
     let mut errors = validator.iter_errors(&instance_json);
@@ -190,7 +194,19 @@ pub(crate) mod tests_util {
 
 // Styling
 
+// Colors for success and failure messages
 const GREEN: Color = Color::Ansi(AnsiColor::Green);
 const RED: Color = Color::Ansi(AnsiColor::Red);
 const SUCCESS: Style = Style::new().fg_color(Some(GREEN)).bold();
 const FAILURE: Style = Style::new().fg_color(Some(RED)).bold();
+
+/// Styling for clap arguments
+// Adapted from https://github.com/8LWXpg/ptr/blob/83aa1d1814ec98d7854e1f4df52d66b8172f6eda/src/main.rs#L124-L131
+const STYLE: Styles = clap::builder::Styles::styled()
+    .usage(AnsiColor::BrightGreen.on_default())
+    .header(AnsiColor::BrightGreen.on_default())
+    .literal(AnsiColor::BrightCyan.on_default())
+    .invalid(AnsiColor::BrightYellow.on_default())
+    .error(AnsiColor::BrightRed.on_default().bold())
+    .valid(AnsiColor::BrightGreen.on_default())
+    .placeholder(AnsiColor::Cyan.on_default());
