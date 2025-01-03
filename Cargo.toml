@@ -10,6 +10,8 @@ description = "A fast and *smart* command-line tool for JSON Schema validation, 
 keywords = ["json", "schema", "validation", "cli", "command-line"]
 
 [dependencies]
+anstream = "0.6.18"
+anstyle = "1.0.10"
 clap = { version = "4.5.23", features = ["derive"] }
 globwalk = "0.9.1"
 jsonc-parser = { version = "0.26.2", features = ["serde"] }

@@ -1,4 +1,6 @@
 pub mod include;
+use anstream::println;
+use anstyle::{Style, Color, AnsiColor};
 use clap::Parser;
 use include::Include;
 use serde_json::Value;
@@ -104,17 +106,17 @@ pub fn validate_instance(instance: &Path, schema_json: &Value) -> Result<bool, B
             let filename = instance.to_string_lossy();
             if let Some(first) = errors.next() {
                 success = false;
-                println!("- `{filename}` - INVALID. Errors:");
+                println!("- `{filename}` - {FAILURE}INVALID{FAILURE:#}. Errors:");
                 println!("  1. {first}");
                 for (i, error) in errors.enumerate() {
                     println!("  {}. {error}", i + 2);
                 }
             } else {
-                println!("- `{filename}` - VALID");
+                println!("- `{filename}` - {SUCCESS}VALID{SUCCESS:#}");
             }
         }
         Err(error) => {
-            println!("Invalid schema: {error}");
+            println!("{FAILURE}Invalid schema{FAILURE:#}: {error}");
             success = false;
         }
     }
@@ -169,6 +171,7 @@ pub fn run(config: &Config, base: &str) -> Result<bool, Box<dyn Error>> {
             let valid = validate_instance(&instance, &schema_json)?;
             success &= valid;
         }
+        println!();
     }
     Ok(success)
 }
@@ -185,3 +188,10 @@ pub(crate) mod tests_util {
         paths.iter().map(|p| PathBuf::from(p)).collect()
     }
 }
+
+// Styling
+
+const GREEN: Color = Color::Ansi(AnsiColor::Green);
+const RED: Color = Color::Ansi(AnsiColor::Red);
+const SUCCESS: Style = Style::new().fg_color(Some(GREEN)).bold();
+const FAILURE: Style = Style::new().fg_color(Some(RED)).bold();

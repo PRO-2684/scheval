@@ -1011,6 +1011,8 @@ dependencies = [
 name = "scheval"
 version = "0.1.1"
 dependencies = [
+ "anstream",
+ "anstyle",
  "clap",
  "globwalk",
  "jsonc-parser",
