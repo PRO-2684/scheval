@@ -1,3 +1,33 @@
+//! `scheval`: A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate.
+//!
+//! ## Command-Line Tool
+//!
+//! Note that if you see this message, you're viewing the documentation of the `scheval` **library crate**. To install the `scheval` **command-line tool** from source, you can run:
+//!
+//! ```shell
+//! cargo install scheval
+//! ```
+//!
+//! For more information and alternative installation methods for the CLI, please refer to the README file on one of the following platforms:
+//!
+//! - [GitHub](https://github.com/PRO-2684/scheval)
+//! - [Crates.io](https://crates.io/crates/scheval)
+//!
+//! ## Library Crate
+//!
+//! The `scheval` library crate is designed to be a reusable and extensible library for smart JSON Schema validation. Built on top of the `jsonschema` crate, `scheval` does not implement JSON Schema validation itself. Rather, it provides a set of smart including features to automatically associate JSON instances with their corresponding schemas, and then validate them in batch.
+//!
+//! The main entry point of the library is the [`run`] function, which takes a [`Config`] and a base directory as input, and returns a `Result`.
+//!
+//! - The [`Config`] struct offers a simple way to configure what smart including features to use, and can be constructed either manually or automatically from command line arguments using the [`get_config`] function.
+//! - The base directory is a string slice representing the base path, or working directory, from which we start to search for JSON instances and schemas and resolve relative paths.
+//! - The return value is a `Result`, where:
+//!     - `Ok(true)` indicates that all instances are valid.
+//!     - `Ok(false)` indicates that at least one instance is invalid, or a invalid schema is encountered.
+//!     - `Err(error)` indicates that an error occurred during the validation process. It could be an I/O error, a JSON parsing error etc.
+//!
+//! Refer to the binary crate for a complete example of using the `scheval` library crate.
+
 pub mod include;
 use clap::{
     builder::styling::{AnsiColor, Color, Style, Styles},
@@ -16,7 +46,7 @@ use std::{
 
 // Arguments & Configuration
 
-/// Command line arguments.
+/// Command-line arguments.
 #[derive(Parser, Debug)]
 #[command(version, about = format!("A fast and {ITALIC}*smart*{ITALIC:#} command-line tool for JSON Schema validation, powered by the {UNDERLINE}`jsonschema`{UNDERLINE:#} crate."), long_about = None, styles = CLAP_STYLE)]
 struct Args {
