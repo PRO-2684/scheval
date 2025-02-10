@@ -8,6 +8,7 @@ license = "MIT"
 readme = "README.md"
 description = "A fast and *smart* command-line tool for JSON Schema validation, powered by the `jsonschema` crate."
 keywords = ["json", "schema", "validation", "cli", "command-line"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 anstream = "0.6.18"
